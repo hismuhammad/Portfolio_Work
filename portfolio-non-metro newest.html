@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E2E Non-Metro Network Optimization | Portfolio Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B2838;
+    --navy-deep: #0F1923;
+    --navy-light: #2A3F54;
+    --amber: #C8A951;
+    --amber-bright: #E8C95A;
+    --amber-muted: #A68B3E;
+    --paper: #F8F5EE;
+    --paper-warm: #F0EBE0;
+    --paper-cool: #EFF2F5;
+    --slate: #374151;
+    --slate-light: #6B7280;
+    --teal: #0D9488;
+    --teal-dark: #0F766E;
+    --red-muted: #B45454;
+    --red-bg: #FEF2F2;
+    --green: #059669;
+    --green-bg: #ECFDF5;
+    --border: #E5E1D8;
+    --shadow: rgba(27, 40, 56, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--slate);
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === HERO COVER === */
+  .hero {
+    background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 40%, var(--navy-light) 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 4rem;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(200,169,81,0.04) 79px, rgba(200,169,81,0.04) 80px),
+      repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(200,169,81,0.04) 79px, rgba(200,169,81,0.04) 80px);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    right: -100px;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,169,81,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-badge::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--amber);
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1.15;
+    max-width: 800px;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+    font-weight: 400;
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .hero-stat {
+    position: relative;
+    padding-left: 1rem;
+    border-left: 2px solid var(--amber);
+  }
+
+  .hero-stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #fff;
+    display: block;
+  }
+
+  .hero-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.45);
+    margin-top: 0.25rem;
+  }
+
+  .hero-meta {
+    position: absolute;
+    bottom: 3rem;
+    right: 4rem;
+    text-align: right;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1s forwards;
+  }
+
+  .hero-meta-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.05em;
+    line-height: 1.8;
+  }
+
+  /* === SECTION LAYOUT === */
+  .section {
+    padding: 5rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-full {
+    padding: 5rem 4rem;
+  }
+
+  .section-dark {
+    background: var(--navy-deep);
+    color: #fff;
+  }
+
+  .section-paper {
+    background: var(--paper-warm);
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--amber-muted);
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    color: var(--navy);
+    line-height: 1.25;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-dark .section-title {
+    color: #fff;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--amber-muted);
+  }
+
+  /* === EXECUTIVE SUMMARY === */
+  .exec-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .exec-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    line-height: 1.9;
+    color: var(--slate);
+    font-weight: 300;
+  }
+
+  .exec-text strong {
+    font-weight: 600;
+    color: var(--navy);
+  }
+
+  .exec-sidebar {
+    background: var(--navy-deep);
+    border-radius: 8px;
+    padding: 2.5rem;
+    color: #fff;
+  }
+
+  .exec-sidebar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1.5rem;
+  }
+
+  .exec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .exec-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .exec-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: rgba(200,169,81,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .exec-item-text {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .exec-item-text strong {
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* === STRATEGIC GAP === */
+  .gap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .gap-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .gap-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px var(--shadow);
+  }
+
+  .gap-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .gap-card-icon.red { background: var(--red-bg); }
+  .gap-card-icon.amber { background: rgba(200,169,81,0.12); }
+  .gap-card-icon.teal { background: rgba(13,148,136,0.08); }
+
+  .gap-card h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--navy);
+    margin-bottom: 0.6rem;
+  }
+
+  .gap-card p {
+    font-size: 0.88rem;
+    color: var(--slate-light);
+    line-height: 1.7;
+  }
+
+  .gap-metric {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--red-muted);
+    margin: 0.8rem 0 0.3rem;
+  }
+
+  .gap-metric-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--slate-light);
+  }
+
+  /* === DIAGNOSTIC TABLE === */
+  .diagnostic-wrapper {
+    margin-top: 2.5rem;
+    overflow-x: auto;
+  }
+
+  .diagnostic-note {
+    font-size: 0.85rem;
+    color: var(--slate-light);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  table.data-table thead {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  table.data-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.9rem 1rem;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  table.data-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  table.data-table tbody tr:hover {
+    background: rgba(200,169,81,0.04);
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .badge-red { background: var(--red-bg); color: var(--red-muted); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-amber { background: rgba(200,169,81,0.12); color: var(--amber-muted); }
+  .badge-teal { background: rgba(13,148,136,0.08); color: var(--teal-dark); }
+
+  .cpp-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cpp-bar-fill {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--red-muted);
+    transition: width 0.8s ease;
+  }
+
+  .cpp-bar-fill.good { background: var(--green); }
+  .cpp-bar-fill.warn { background: var(--amber); }
+
+  /* === ARCHITECTURAL SOLUTION === */
+  .solution-intro {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    max-width: 720px;
+    margin-bottom: 3rem;
+  }
+
+  .solution-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .action-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  .action-card.close::before { background: var(--red-muted); }
+  .action-card.relocate::before { background: var(--teal); }
+  .action-card.split::before { background: var(--amber); }
+  .action-card.new::before { background: var(--green); }
+
+  .action-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .action-card-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .action-card h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--navy);
+  }
+
+  .action-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .action-card li {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--slate);
+    padding: 0.5rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .action-card li:last-child { border-bottom: none; }
+
+  .action-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1rem;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--slate-light);
+  }
+
+  /* === REGION DEEP DIVES === */
+  .regions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .region-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 2rem;
+  }
+
+  .region-card h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.15rem;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+  }
+
+  .region-card .region-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .region-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .region-stat:last-child { border-bottom: none; }
+
+  .region-stat-label {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.55);
+  }
+
+  .region-stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .region-stat-value.green { color: var(--green); }
+  .region-stat-value.amber { color: var(--amber-bright); }
+
+  /* === PROFITABILITY IMPACT === */
+  .impact-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .impact-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .impact-card.primary {
+    background: var(--navy-deep);
+    color: #fff;
+    border-color: var(--navy-deep);
+  }
+
+  .impact-card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    margin-bottom: 0.8rem;
+  }
+
+  .impact-card.primary .impact-card-label {
+    color: rgba(255,255,255,0.45);
+  }
+
+  .impact-card-value {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .impact-card.primary .impact-card-value {
+    color: var(--amber-bright);
+  }
+
+  .impact-card-unit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--slate-light);
+  }
+
+  .impact-card.primary .impact-card-unit {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .impact-narrative {
+    max-width: 760px;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--slate);
+  }
+
+  .impact-narrative p {
+    margin-bottom: 1.2rem;
+  }
+
+  .impact-breakdown {
+    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .breakdown-table {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .breakdown-table-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+
+  .breakdown-row.total {
+    background: var(--paper-warm);
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+  }
+
+  .breakdown-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+
+  .breakdown-value.green { color: var(--green); }
+  .breakdown-value.red { color: var(--red-muted); }
+
+  /* === KPI COMPARISON === */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .kpi-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+  }
+
+  .kpi-card-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    margin-bottom: 1.5rem;
+  }
+
+  .kpi-comparison {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .kpi-before, .kpi-after {
+    text-align: center;
+  }
+
+  .kpi-period {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-number {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .kpi-before .kpi-number { color: var(--red-muted); }
+  .kpi-after .kpi-number { color: var(--green); }
+
+  .kpi-desc {
+    font-size: 0.78rem;
+    color: var(--slate-light);
+    margin-top: 0.3rem;
+  }
+
+  .kpi-arrow {
+    font-size: 1.5rem;
+    color: var(--amber);
+  }
+
+  .kpi-delta {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    margin-top: 0.5rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+
+  .kpi-delta.positive { background: var(--green-bg); color: var(--green); }
+  .kpi-delta.negative { background: var(--red-bg); color: var(--red-muted); }
+
+  /* === VISUAL CONCEPT === */
+  .visual-concept {
+    background: var(--paper-cool);
+    border-radius: 12px;
+    padding: 3rem;
+    margin-top: 2rem;
+  }
+
+  .visual-concept h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--navy);
+    margin-bottom: 1.5rem;
+  }
+
+  .viz-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .viz-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .viz-card h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+  }
+
+  .viz-card p {
+    font-size: 0.8rem;
+    color: var(--slate-light);
+    line-height: 1.6;
+  }
+
+  .viz-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  /* === TOOLS & METHODOLOGY === */
+  .tools-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .tool-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.8);
+    transition: border-color 0.3s ease;
+  }
+
+  .tool-tag:hover {
+    border-color: var(--amber);
+  }
+
+  .tool-tag-icon {
+    font-size: 1.1rem;
+  }
+
+  /* === DISCLAIMER === */
+  .disclaimer {
+    background: rgba(200,169,81,0.06);
+    border: 1px solid rgba(200,169,81,0.15);
+    border-radius: 6px;
+    padding: 1rem 1.5rem;
+    margin-top: 3rem;
+    font-size: 0.78rem;
+    color: var(--slate-light);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .disclaimer strong {
+    color: var(--amber-muted);
+    font-style: normal;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    background: var(--navy-deep);
+    color: rgba(255,255,255,0.4);
+    padding: 3rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+  }
+
+  .footer-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .footer-links a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
+  }
+
+  .footer-links a:hover { color: var(--amber); }
+
+  /* === DIVIDER === */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 4rem;
+    margin: 0;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .divider-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* === PRINT STYLES === */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { font-size: 11px; }
+    .hero { min-height: auto; padding: 3rem 2.5rem; page-break-after: always; }
+    .hero h1 { font-size: 2.2rem; }
+    .hero-stats { gap: 1.5rem; }
+    .hero-stat-value { font-size: 1.4rem; }
+    .hero-meta { position: static; text-align: left; margin-top: 2rem; }
+    .section { padding: 2.5rem; }
+    .section-full { padding: 2.5rem; }
+    .exec-summary { grid-template-columns: 1fr; gap: 2rem; }
+    .gap-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .gap-card { padding: 1.2rem; }
+    .solution-actions { grid-template-columns: 1fr; }
+    .regions { grid-template-columns: 1fr; }
+    .impact-hero { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .impact-breakdown { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .viz-grid { grid-template-columns: 1fr; }
+    .fade-in { opacity: 1; transform: none; }
+    .gap-card:hover { transform: none; box-shadow: none; }
+    .section-dark { background: var(--navy-deep) !important; }
+    .exec-sidebar { background: var(--navy-deep) !important; }
+    .impact-card.primary { background: var(--navy-deep) !important; }
+    table.data-table thead { background: var(--navy) !important; }
+    .footer { padding: 1.5rem 2.5rem; }
+    .action-card, .gap-card, .impact-card, .kpi-card, .breakdown-table, .region-card {
+      break-inside: avoid;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 2rem; }
+    .hero h1 { font-size: 2rem; }
+    .hero-stats { flex-direction: column; gap: 1.5rem; }
+    .hero-meta { position: static; margin-top: 2rem; text-align: left; }
+    .section { padding: 3rem 2rem; }
+    .section-full { padding: 3rem 2rem; }
+    .exec-summary { grid-template-columns: 1fr; }
+    .gap-grid { grid-template-columns: 1fr; }
+    .solution-actions { grid-template-columns: 1fr; }
+    .regions { grid-template-columns: 1fr; }
+    .impact-hero { grid-template-columns: 1fr; }
+    .impact-breakdown { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .viz-grid { grid-template-columns: 1fr; }
+    .footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+  /* === VIZ CHART STYLES === */
+  .chart-wrap { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow-x: auto; margin-bottom: 2.5rem; }
+  .chart-wrap + .chart-wrap { margin-top: 0; }
+  .viz-sub-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate-light); margin-bottom: 0.4rem; }
+  .viz-sub-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.3rem; color: var(--slate); }
+  .viz-sub-title em { font-style: italic; color: var(--teal); }
+  .viz-sub-desc { font-size: 0.82rem; color: var(--slate-light); max-width: 640px; line-height: 1.7; margin-bottom: 1.2rem; }
+  .viz-legend-strip { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .viz-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--slate-light); }
+  .viz-legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .viz-legend-rect { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+  .viz-grid-line { stroke: #E5E7EB; stroke-dasharray: 3,3; }
+  .viz-axis text { font-family: 'DM Sans', sans-serif; font-size: 11px; fill: #6B7280; }
+  .viz-axis path, .viz-axis line { stroke: #D1D5DB; }
+  .viz-tooltip { position: absolute; pointer-events: none; background: var(--navy); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 0.75rem; line-height: 1.6; opacity: 0; transition: opacity 0.15s; z-index: 100; max-width: 260px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+  .viz-tooltip strong { color: var(--amber-bright); }
+  .viz-methodology { font-size: 0.72rem; color: var(--slate-light); line-height: 1.7; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+</head>
+<body>
+
+<!-- ============ HERO COVER ============ -->
+<section class="hero">
+  <div class="hero-badge">Portfolio Case Study &mdash; FY25&ndash;FY26</div>
+  <h1>Architecting Profitability<br>Across Indonesia's<br><em>Non-Metro Network</em></h1>
+  <p class="hero-subtitle">
+    How strategic facility rationalization and E2E network redesign across 35+ logistics nodes
+    transformed a cost-burdened Non-Metro operation into a leaner, more profitable network&mdash;without
+    compromising service coverage.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-value">&minus;38%</span>
+      <span class="hero-stat-label">Network Rental Cost Reduction</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-value">35 &rarr; 29</span>
+      <span class="hero-stat-label">Active Nodes Optimized</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-value">4 Corridors</span>
+      <span class="hero-stat-label">W. Java &bull; C. Java &bull; E. Java &bull; Sumatera</span>
+    </div>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-meta-line">Hisyam Muhammad</div>
+    <div class="hero-meta-line">Logistics Strategy &amp; Profitability Architect</div>
+    <div class="hero-meta-line">FY25&ndash;FY26 &bull; Indonesia</div>
+  </div>
+</section>
+
+<!-- ============ EXECUTIVE SUMMARY ============ -->
+<section class="section fade-in">
+  <div class="section-label">01 &mdash; Executive Summary</div>
+  <div class="section-title">Where Network Efficiency<br>Meets <em>Financial Discipline</em></div>
+
+  <div class="exec-summary">
+    <div class="exec-text">
+      <p>Indonesia's Non-Metro logistics network, spanning West Java, Central Java, East Java-Bali-Sulawesi, and Sumatera-Kalimantan, carried a structural cost burden that eroded margin at every node. Across 35+ facilities, rental cost efficiency routinely ran 2&ndash;5x above internal benchmarks, with utilization rates critically low at several hubs.</p>
+      <br>
+      <p>Through a systematic, data-driven network blueprint&mdash;combining QGIS spatial analysis, SQL-based volume profiling, and Excel-driven scenario modeling&mdash;this initiative <strong>closed underperforming nodes, relocated oversized facilities to right-sized alternatives, and split monolithic hubs</strong> to unlock coverage efficiency.</p>
+      <br>
+      <p>The result: <strong>a 38% reduction in annualized network rental costs</strong>, a 63% improvement in cost-per-parcel at relocated nodes, and a network architecture that positions the business for profitable scale as volume grows across Indonesia's outer corridors.</p>
+    </div>
+
+    <div class="exec-sidebar">
+      <div class="exec-sidebar-title">Scope of Work</div>
+      <div class="exec-item">
+        <div class="exec-icon">&#9672;</div>
+        <div class="exec-item-text"><strong>End-to-End Network Design</strong> &mdash; First-mile pickup, middle-mile consolidation, last-mile delivery, and cross-docking node optimization across Non-Metro regions</div>
+      </div>
+      <div class="exec-item">
+        <div class="exec-icon">&#9670;</div>
+        <div class="exec-item-text"><strong>Facility Lifecycle Management</strong> &mdash; Closure, relocation, split, renewal, and new-build decisions tied to lease expirations</div>
+      </div>
+      <div class="exec-item">
+        <div class="exec-icon">&#9674;</div>
+        <div class="exec-item-text"><strong>P&amp;L-Linked Network Planning</strong> &mdash; Every node decision evaluated against cost-per-parcel, utilization, and rental yield metrics</div>
+      </div>
+      <div class="exec-item">
+        <div class="exec-icon">&#9673;</div>
+        <div class="exec-item-text"><strong>Cross-Functional Alignment</strong> &mdash; Bridging Operations, Finance, and Real Estate teams on a unified FY25&ndash;FY26 network roadmap</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
+
+<!-- ============ STRATEGIC GAP ============ -->
+<section class="section fade-in">
+  <div class="section-label">02 &mdash; The Strategic Gap</div>
+  <div class="section-title">A Network Built for Coverage,<br>Not <em>Profitability</em></div>
+
+  <p style="max-width: 720px; font-size: 1rem; line-height: 1.85; margin-bottom: 0.5rem;">
+    The FY25 Non-Metro network was designed during a period of aggressive geographic expansion. While this achieved broad coverage, it left behind a long tail of structurally unprofitable nodes&mdash;facilities that could never reach the volume density needed to justify their fixed costs.
+  </p>
+
+  <div class="gap-grid">
+    <div class="gap-card">
+      <div class="gap-card-icon red">&#9888;</div>
+      <h3>Chronic Underutilization</h3>
+      <p>Multiple nodes operated at under 10% of the company's utilization benchmark. Several facilities in Sumatera and Riau carried significant fixed costs with minimal daily volume throughput, making profitability structurally impossible.</p>
+      <div class="gap-metric">&lt;10%</div>
+      <div class="gap-metric-label">Utilization at worst-performing nodes</div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-card-icon amber">&#9679;</div>
+      <h3>Escalating Cost-per-Parcel</h3>
+      <p>Rental cost per parcel at several Non-Metro nodes ran 2&ndash;8x above company targets. One island hub exceeded the benchmark by nearly 8x, driven by seasonal volume imbalance and an oversized facility that was never right-sized for actual throughput.</p>
+      <div class="gap-metric">8x</div>
+      <div class="gap-metric-label">Highest CPP overshoot vs. benchmark</div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-card-icon teal">&#9881;</div>
+      <h3>Oversized &amp; Redundant Nodes</h3>
+      <p>Former regional consolidation hubs and large cross-docking facilities retained excessive floor space after being downgraded to delivery-only operations, creating dead-cost square footage with no volume upside.</p>
+      <div class="gap-metric">35+</div>
+      <div class="gap-metric-label">Active nodes across 4 corridors</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NETWORK DIAGNOSTIC ============ -->
+<section class="section section-paper fade-in">
+  <div class="section-label">03 &mdash; Network Diagnostic</div>
+  <div class="section-title">Node-by-Node <em>Assessment</em></div>
+
+  <p class="diagnostic-note">
+    Selected critical Non-Metro nodes from the FY25 Blueprint diagnostic. Cost and utilization metrics used to prioritize closure, relocation, or retention decisions. Specific figures anonymized for external sharing.
+  </p>
+
+  <div class="diagnostic-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Facility</th>
+          <th>Corridor</th>
+          <th>Size Class</th>
+          <th>Volume Profile</th>
+          <th>CPP vs. Target</th>
+          <th>Utilization</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hub A</strong></td>
+          <td>Sumatera Barat</td>
+          <td>Small</td>
+          <td>Very Low</td>
+          <td>
+            <div class="cpp-bar">
+              <span>7x target</span>
+              <div class="cpp-bar-fill" style="width: 95%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-red">Critical</span></td>
+          <td><span class="badge badge-red">Close</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hub B</strong></td>
+          <td>Riau</td>
+          <td>Small</td>
+          <td>Very Low</td>
+          <td>
+            <div class="cpp-bar">
+              <span>4x target</span>
+              <div class="cpp-bar-fill" style="width: 70%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-red">Critical</span></td>
+          <td><span class="badge badge-amber">Retain*</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hub C</strong></td>
+          <td>Bali</td>
+          <td>Medium</td>
+          <td>High (Seasonal)</td>
+          <td>
+            <div class="cpp-bar">
+              <span>8x target</span>
+              <div class="cpp-bar-fill" style="width: 100%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-red">Critical</span></td>
+          <td><span class="badge badge-teal">Relocate</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hub D</strong></td>
+          <td>Central Java</td>
+          <td>Small</td>
+          <td>Low</td>
+          <td>
+            <div class="cpp-bar">
+              <span>2x target</span>
+              <div class="cpp-bar-fill" style="width: 45%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-red">Low</span></td>
+          <td><span class="badge badge-teal">Relocate</span></td>
+        </tr>
+        <tr>
+          <td><strong>Gateway E</strong></td>
+          <td>East Java</td>
+          <td>Large</td>
+          <td>Very High</td>
+          <td>
+            <div class="cpp-bar">
+              <span>Within target</span>
+              <div class="cpp-bar-fill good" style="width: 20%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-green">Good</span></td>
+          <td><span class="badge badge-teal">Relocate*</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hub F</strong></td>
+          <td>Sumatera Utara</td>
+          <td>Small</td>
+          <td>Low</td>
+          <td>
+            <div class="cpp-bar">
+              <span>3x target</span>
+              <div class="cpp-bar-fill" style="width: 55%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-red">Low</span></td>
+          <td><span class="badge badge-teal">Relocate</span></td>
+        </tr>
+        <tr>
+          <td><strong>Hub G</strong></td>
+          <td>West Java</td>
+          <td>Small</td>
+          <td>Low</td>
+          <td>
+            <div class="cpp-bar">
+              <span>2x target</span>
+              <div class="cpp-bar-fill" style="width: 38%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-red">Low</span></td>
+          <td><span class="badge badge-amber">Split</span></td>
+        </tr>
+        <tr>
+          <td><strong>Anchor H</strong></td>
+          <td>Central Java</td>
+          <td>Large</td>
+          <td>Very High</td>
+          <td>
+            <div class="cpp-bar">
+              <span>Within target</span>
+              <div class="cpp-bar-fill good" style="width: 15%;"></div>
+            </div>
+          </td>
+          <td><span class="badge badge-green">Optimal</span></td>
+          <td><span class="badge badge-green">Retain</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 0.75rem; color: var(--slate-light); margin-top: 1rem; font-style: italic;">*Gateway E relocated to right-size the facility despite good CPP, unlocking further savings. Hub B retained due to strategic corridor necessity despite poor economics.</p>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
+
+<!-- ============ ARCHITECTURAL SOLUTION ============ -->
+<section class="section fade-in">
+  <div class="section-label">04 &mdash; Architectural Solution</div>
+  <div class="section-title">Redesigning the Network<br>for <em>Structural Profit</em></div>
+
+  <p class="solution-intro">
+    The FY26 Non-Metro network blueprint deployed four interlocking levers, each calibrated to the specific failure mode identified in the FY25 diagnostic. Every decision was anchored to a simple principle: <strong>no facility should exist without a clear path to cost-efficiency compliance.</strong>
+  </p>
+
+  <div class="solution-actions">
+    <div class="action-card close">
+      <div class="action-card-header">
+        <div class="action-card-num">1</div>
+        <h3>Strategic Closures</h3>
+      </div>
+      <ul>
+        <li><strong>Sumatera Barat Hub</strong> &mdash; Closed and volume migrated to a neighboring hub within a 20km catchment radius. The node operated at under 10% utilization. Merging coverage eliminated redundant fixed costs while maintaining service levels in the corridor.</li>
+        <li><strong>North Sumatera Hub</strong> &mdash; Closed post-lease expiry. Volume absorbed by a relocated satellite hub, creating a more concentrated and efficient last-mile footprint in the region.</li>
+      </ul>
+    </div>
+
+    <div class="action-card relocate">
+      <div class="action-card-header">
+        <div class="action-card-num">2</div>
+        <h3>Right-Size Relocations</h3>
+      </div>
+      <ul>
+        <li><strong>Surabaya Gateway (East Java)</strong> &mdash; The largest single intervention: relocated from an oversized regional hub to a right-sized facility, reducing floor area by 54% and cutting rental costs by 78%. This single move contributed the largest share of total savings.</li>
+        <li><strong>West Java Corridor Hub</strong> &mdash; Relocated and split from an expensive facility to a leaner hub plus a satellite node, reducing the cost base by 86% while preserving coverage density.</li>
+        <li><strong>Bali-Sulawesi Spoke</strong> &mdash; Relocated to a smaller facility, cutting rental overhead by 66% for a node serving primarily as a last-mile delivery point.</li>
+        <li><strong>Central Java Former Hub</strong> &mdash; A former regional consolidation hub relocated to a right-sized facility. As a delivery-only node post-downgrade, the original floor space was dead cost.</li>
+      </ul>
+    </div>
+
+    <div class="action-card split">
+      <div class="action-card-header">
+        <div class="action-card-num">3</div>
+        <h3>Coverage Splits</h3>
+      </div>
+      <ul>
+        <li><strong>West Java Split</strong> &mdash; One oversized hub split into a primary node and a smaller satellite, enabling tighter last-mile routing and reducing dead mileage in low-density corridors.</li>
+        <li><strong>Corridor FM/LM Unbundling</strong> &mdash; Multiple hubs split to unbundle first-mile pickup and last-mile delivery coverage zones, improving utilization density at each sub-node.</li>
+        <li><strong>Consolidation Load Redistribution</strong> &mdash; A high-volume hub split across three nodes to redistribute consolidation load and prevent single-point capacity bottlenecks during peak seasons.</li>
+      </ul>
+    </div>
+
+    <div class="action-card new">
+      <div class="action-card-header">
+        <div class="action-card-num">4</div>
+        <h3>Targeted Expansion</h3>
+      </div>
+      <ul>
+        <li><strong>Central Java Cross-Dock</strong> &mdash; A new small cross-dock facility established to plug a coverage gap in a key corridor, reducing dependency on a distant consolidation hub and shortening delivery lead times.</li>
+        <li><strong>Palembang First-Mile Expansion</strong> &mdash; Identified untapped first-mile volume within existing last-mile delivery zones in South Sumatera. Upgraded two nodes toward multifunction capability to capture new revenue without requiring additional real estate.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REGION DEEP DIVES ============ -->
+<section class="section section-dark section-full fade-in">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div class="section-label">05 &mdash; Regional Deep Dives</div>
+    <div class="section-title">Four Corridors, <em>One Blueprint</em></div>
+
+    <div class="regions">
+      <div class="region-card">
+        <h3>West Java</h3>
+        <div class="region-sub">Non-Metro &bull; 11 Facilities Assessed</div>
+        <div class="region-stat">
+          <span class="region-stat-label">Facilities Restructured</span>
+          <span class="region-stat-value">3 relocated or split</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Key Action</span>
+          <span class="region-stat-value amber">Split &amp; right-size corridor hubs</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Largest Single Saving</span>
+          <span class="region-stat-value green">86% cost reduction at one node</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Retained Anchors</span>
+          <span class="region-stat-value">5 strategic hubs retained</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Strategy</span>
+          <span class="region-stat-value" style="font-size: 0.75rem;">Right-size last-mile spokes; retain first-mile anchors</span>
+        </div>
+      </div>
+
+      <div class="region-card">
+        <h3>Central Java &amp; Yogyakarta</h3>
+        <div class="region-sub">Non-Metro &bull; 12 Facilities Assessed</div>
+        <div class="region-stat">
+          <span class="region-stat-label">Facilities Restructured</span>
+          <span class="region-stat-value">4 relocated or right-sized</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">New Facility</span>
+          <span class="region-stat-value amber">1 new cross-dock opened</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Key Achievement</span>
+          <span class="region-stat-value green">Former oversized hubs right-sized</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Retained Anchors</span>
+          <span class="region-stat-value">4 high-utilization hubs retained</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Strategy</span>
+          <span class="region-stat-value" style="font-size: 0.75rem;">Downsize former regional hubs; protect high-util nodes</span>
+        </div>
+      </div>
+
+      <div class="region-card">
+        <h3>East Java, Bali &amp; Sulawesi</h3>
+        <div class="region-sub">Non-Metro &bull; 10 Facilities Assessed</div>
+        <div class="region-stat">
+          <span class="region-stat-label">Facilities Restructured</span>
+          <span class="region-stat-value">3 relocated or converted</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Flagship Move</span>
+          <span class="region-stat-value amber">Surabaya Gateway right-sized</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Gateway Savings</span>
+          <span class="region-stat-value green">78% rental cost reduction</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Retained Anchors</span>
+          <span class="region-stat-value">4 strategic hubs retained</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Strategy</span>
+          <span class="region-stat-value" style="font-size: 0.75rem;">Right-size large hubs; low-cost model for island nodes</span>
+        </div>
+      </div>
+
+      <div class="region-card">
+        <h3>Sumatera &amp; Kalimantan</h3>
+        <div class="region-sub">Non-Metro &bull; 12 Facilities Assessed</div>
+        <div class="region-stat">
+          <span class="region-stat-label">Facilities Closed</span>
+          <span class="region-stat-value">2 nodes consolidated</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Facilities Restructured</span>
+          <span class="region-stat-value amber">3 relocated or right-sized</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Key Achievement</span>
+          <span class="region-stat-value green">Closed nodes with &lt;10% utilization</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Revenue Expansion</span>
+          <span class="region-stat-value amber">Palembang first-mile capture</span>
+        </div>
+        <div class="region-stat">
+          <span class="region-stat-label">Strategy</span>
+          <span class="region-stat-value" style="font-size: 0.75rem;">Consolidate sparse corridors; expand first-mile capture</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROFITABILITY IMPACT ============ -->
+<section class="section fade-in">
+  <div class="section-label">06 &mdash; Profitability Impact Analysis</div>
+  <div class="section-title">Connecting Physical Network Changes<br>to <em>P&amp;L Improvements</em></div>
+
+  <div class="impact-hero">
+    <div class="impact-card primary">
+      <div class="impact-card-label">Total Cost Reduction</div>
+      <div class="impact-card-value">&minus;38%</div>
+      <div class="impact-card-unit">Non-Metro Network &bull; FY26</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-card-label">Phase 1 Realized</div>
+      <div class="impact-card-value">&minus;50%</div>
+      <div class="impact-card-unit">Closed + Relocated (Actualized)</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-card-label">Phase 2 Planned</div>
+      <div class="impact-card-value">&minus;50%</div>
+      <div class="impact-card-unit">Relocate + Split (Budgeted)</div>
+    </div>
+  </div>
+
+  <div class="impact-narrative">
+    <p>The profitability impact extends well beyond simple rental reduction. Each facility decision was evaluated through a three-layer P&amp;L lens: <strong>direct rental savings</strong>, <strong>operational efficiency gains</strong> from improved volume density, and <strong>revenue protection</strong> through maintained coverage continuity.</p>
+    <p>The closure of two Sumatera nodes eliminated fixed costs entirely while migrating volume to neighboring hubs that gained density&mdash;improving their own cost metrics in a virtuous cycle. The Surabaya Gateway relocation alone was the single largest contributor, right-sizing a large regional hub by 54% and delivering a 78% rental cost reduction while maintaining consolidation capacity for the East Java corridor.</p>
+  </div>
+
+  <div class="impact-breakdown">
+    <div class="breakdown-table">
+      <div class="breakdown-table-header">Phase 1 &mdash; Realized Actions (Non-Metro)</div>
+      <div class="breakdown-row">
+        <span>Sumatera Hub Closures (2 nodes)</span>
+        <span class="breakdown-value green">15% of total savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Sumatera &amp; Kalimantan Relocations</span>
+        <span class="breakdown-value green">12% of total savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Java Corridor Relocations (5 hubs)</span>
+        <span class="breakdown-value green">49% of total savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>East Java &amp; Bali Relocations</span>
+        <span class="breakdown-value green">18% of total savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Corridor Splits &amp; Reallocations</span>
+        <span class="breakdown-value green">6% of total savings</span>
+      </div>
+      <div class="breakdown-row total">
+        <span>Phase 1 Contribution</span>
+        <span class="breakdown-value green">50% of total program</span>
+      </div>
+    </div>
+
+    <div class="breakdown-table">
+      <div class="breakdown-table-header">Phase 2 &mdash; Planned Actions (Non-Metro)</div>
+      <div class="breakdown-row">
+        <span>Surabaya Gateway Relocation</span>
+        <span class="breakdown-value green">61% of phase savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>West Java Split &amp; Relocation</span>
+        <span class="breakdown-value green">28% of phase savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>West Java Hub Split</span>
+        <span class="breakdown-value green">7% of phase savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Sumatera Relocation</span>
+        <span class="breakdown-value green">4% of phase savings</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Central Java New Cross-Dock</span>
+        <span class="breakdown-value red">Strategic investment</span>
+      </div>
+      <div class="breakdown-row total">
+        <span>Phase 2 Contribution</span>
+        <span class="breakdown-value green">50% of total program</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
+
+<!-- ============ KEY METRICS ============ -->
+<section class="section section-paper fade-in">
+  <div class="section-label">07 &mdash; Key Metrics &amp; Achievements</div>
+  <div class="section-title">Before vs. <em>After</em></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-card-title">Active Node Count (Non-Metro)</div>
+      <div class="kpi-comparison">
+        <div class="kpi-before">
+          <div class="kpi-period">FY25 (Before)</div>
+          <div class="kpi-number">35</div>
+          <div class="kpi-desc">Active nodes</div>
+        </div>
+        <div class="kpi-arrow">&rarr;</div>
+        <div class="kpi-after">
+          <div class="kpi-period">FY26 (After)</div>
+          <div class="kpi-number">29</div>
+          <div class="kpi-desc">Active nodes</div>
+          <span class="kpi-delta positive">&minus;17% rationalized</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-title">Annual Network Rental Cost</div>
+      <div class="kpi-comparison">
+        <div class="kpi-before">
+          <div class="kpi-period">FY25 (Before)</div>
+          <div class="kpi-number">Base</div>
+          <div class="kpi-desc">Full network spend</div>
+        </div>
+        <div class="kpi-arrow">&rarr;</div>
+        <div class="kpi-after">
+          <div class="kpi-period">FY26 (After)</div>
+          <div class="kpi-number">&minus;38%</div>
+          <div class="kpi-desc">Reduced network spend</div>
+          <span class="kpi-delta positive">Significant annual savings</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-title">Cost-per-Parcel at Relocated Nodes</div>
+      <div class="kpi-comparison">
+        <div class="kpi-before">
+          <div class="kpi-period">FY25 (Before)</div>
+          <div class="kpi-number">3x</div>
+          <div class="kpi-desc">Above benchmark (avg. worst nodes)</div>
+        </div>
+        <div class="kpi-arrow">&rarr;</div>
+        <div class="kpi-after">
+          <div class="kpi-period">FY26 (Target)</div>
+          <div class="kpi-number">1x</div>
+          <div class="kpi-desc">At benchmark compliance</div>
+          <span class="kpi-delta positive">&minus;63% CPP reduction</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-title">Facility Utilization (Volume Density)</div>
+      <div class="kpi-comparison">
+        <div class="kpi-before">
+          <div class="kpi-period">FY25 (Before)</div>
+          <div class="kpi-number">&lt;10%</div>
+          <div class="kpi-desc">At underperforming nodes</div>
+        </div>
+        <div class="kpi-arrow">&rarr;</div>
+        <div class="kpi-after">
+          <div class="kpi-period">FY26 (Target)</div>
+          <div class="kpi-number">60%+</div>
+          <div class="kpi-desc">Right-sized node target</div>
+          <span class="kpi-delta positive">3&ndash;5x density improvement</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATA VISUALIZATIONS ============ -->
+<section class="section fade-in">
+  <div class="section-label">08 &mdash; Data Visualizations</div>
+  <div class="section-title">Network Impact <em>Analytics</em></div>
+
+  <p style="max-width: 720px; font-size: 0.92rem; line-height: 1.85; margin-bottom: 2rem;">
+    Interactive visualizations built from raw blueprint data across 35 Non-Metro logistics nodes in 4 corridors. Every metric sourced directly from the FY25 diagnostic and FY26 facility recap.
+  </p>
+
+  <!-- VIZ 1: Waterfall -->
+  <div class="viz-sub-label">A &mdash; Cost Reduction Waterfall</div>
+  <div class="viz-sub-title">Savings <em>Bridge</em>: FY25 to FY26</div>
+  <div class="viz-sub-desc">How the 38% rental cost reduction was achieved across four strategic levers. Each bar represents a category of network intervention, from closures that eliminated dead-cost nodes to right-size relocations that cut per-node spend by up to 86%.</div>
+  <div class="chart-wrap" id="waterfall-chart"></div>
+
+  <!-- VIZ 2: Node Health Heatmap -->
+  <div class="viz-sub-label">B &mdash; Node Health Heatmap</div>
+  <div class="viz-sub-title">Cost-per-Parcel vs. <em>Utilization Density</em></div>
+  <div class="viz-sub-desc">Each bubble represents a Non-Metro facility. X-axis = rental CPP (lower is better), Y-axis = parcel density per sqm (higher is better). The red zone flags structurally unprofitable nodes. Bubble size reflects daily volume (ADV). Stroke color indicates the action taken.</div>
+  <div class="viz-legend-strip" id="heatmap-legend"></div>
+  <div class="chart-wrap" id="heatmap-chart"></div>
+
+  <!-- VIZ 3: Corridor Impact -->
+  <div class="viz-sub-label">C &mdash; Corridor Impact Analysis</div>
+  <div class="viz-sub-title">Before vs. After by <em>Region</em></div>
+  <div class="viz-sub-desc">Volume-weighted average CPP and utilization density across all four Non-Metro corridors, showing the improvement from FY25 baseline to FY26 target state after closures, relocations, and splits took effect.</div>
+  <div class="viz-legend-strip">
+    <div class="viz-legend-item"><span class="viz-legend-rect" style="background:#B45454;"></span> FY25 Baseline</div>
+    <div class="viz-legend-item"><span class="viz-legend-rect" style="background:#059669;"></span> FY26 Target</div>
+    <div class="viz-legend-item"><span class="viz-legend-rect" style="background:rgba(13,148,136,0.15); border:1px dashed #0D9488;"></span> Benchmark Zone</div>
+  </div>
+  <div class="chart-wrap" id="corridor-chart"></div>
+
+  <div class="viz-methodology">
+    <strong>Methodology:</strong> All metrics sourced from FY25 ID Network Blueprint diagnostic tables and FY26 Non-Metro facility recap (S1 realized + S2 planned). CPP = Annual Rental / (ADV &times; 365). Utilization density = ADV / Facility Area. Corridor averages are volume-weighted. Benchmark zones reflect internal PMI targets by facility tier.
+  </div>
+</section>
+
+<div class="viz-tooltip" id="viz-tooltip"></div>
+
+<div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
+
+<!-- ============ TOOLS & METHODOLOGY ============ -->
+<section class="section section-dark section-full fade-in">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div class="section-label">09 &mdash; Tools &amp; Methodology</div>
+    <div class="section-title">The Analytical <em>Toolkit</em></div>
+
+    <p style="max-width: 640px; font-size: 0.95rem; line-height: 1.8; color: rgba(255,255,255,0.6); margin-bottom: 2rem;">
+      Every network decision was grounded in spatial intelligence, volume analytics, and financial modeling&mdash;not intuition. The following tools formed the analytical backbone of this engagement.
+    </p>
+
+    <div class="tools-grid">
+      <div class="tool-tag">
+        <span class="tool-tag-icon">&#9737;</span>
+        <span><strong>QGIS Mapping</strong> &mdash; Geospatial node placement, coverage radius analysis, and district-level density mapping</span>
+      </div>
+      <div class="tool-tag">
+        <span class="tool-tag-icon">&#9707;</span>
+        <span><strong>SQL</strong> &mdash; Volume extraction, daily throughput profiling, and coverage-to-node attribution across operational databases</span>
+      </div>
+      <div class="tool-tag">
+        <span class="tool-tag-icon">&#9783;</span>
+        <span><strong>Microsoft Excel</strong> &mdash; Blueprint workbook management, scenario modeling for relocation/split decisions, stakeholder-facing financial summaries, and lease expiration tracking</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DISCLAIMER ============ -->
+<section class="section fade-in">
+  <div class="disclaimer">
+    <strong>Confidentiality Note:</strong> This case study has been prepared for portfolio demonstration purposes. All specific financial figures, internal facility identifiers, volume data, and proprietary performance benchmarks have been anonymized or expressed as relative percentages to protect commercially sensitive information. The strategic narrative, methodology, and impact framework accurately represent the scope and outcomes of the engagement.
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div>
+    <div class="footer-name">Hisyam Muhammad</div>
+    <div>Logistics Strategy &amp; Profitability Architect</div>
+  </div>
+  <div class="footer-links">
+    <a href="mailto:hismuhammad@outlook.com">hismuhammad@outlook.com</a>
+    <a href="https://www.linkedin.com/in/hismuhammad/" target="_blank">linkedin.com/in/hismuhammad</a>
+  </div>
+</footer>
+
+<!-- ============ DATA VISUALIZATIONS JS ============ -->
+<script>
+(function(){
+  // === NODE DATA ===
+  const nodes = [
+    {code:"N01",corridor:"West Java",adv:25000,cpp:57,psm:30,action:"Retain",tier:2},
+    {code:"N02",corridor:"West Java",adv:12000,cpp:78,psm:10,action:"Retain",tier:3},
+    {code:"N03",corridor:"West Java",adv:7000,cpp:183,psm:13,action:"Renew",tier:3},
+    {code:"N04",corridor:"West Java",adv:28000,cpp:48,psm:36,action:"Retain",tier:2},
+    {code:"N05",corridor:"West Java",adv:136000,cpp:16,psm:66,action:"Renew",tier:1},
+    {code:"N06",corridor:"West Java",adv:7000,cpp:114,psm:20,action:"Retain",tier:3},
+    {code:"N07",corridor:"West Java",adv:10000,cpp:132,psm:13,action:"Split",tier:3},
+    {code:"N08",corridor:"West Java",adv:11000,cpp:348,psm:8,action:"Relocate",tier:2},
+    {code:"N09",corridor:"West Java",adv:12000,cpp:113,psm:8,action:"Retain",tier:2},
+    {code:"N10",corridor:"West Java",adv:79000,cpp:39,psm:63,action:"Retain",tier:1},
+    {code:"N11",corridor:"West Java",adv:20000,cpp:82,psm:27,action:"Retain",tier:2},
+    {code:"N12",corridor:"West Java",adv:13000,cpp:120,psm:10,action:"Retain",tier:3},
+    {code:"N13",corridor:"West Java",adv:207000,cpp:48,psm:30,action:"Retain",tier:1},
+    {code:"N14",corridor:"West Java",adv:19000,cpp:74,psm:22,action:"Retain",tier:2},
+    {code:"N15",corridor:"Central Java",adv:27000,cpp:41,psm:33,action:"Retain",tier:2},
+    {code:"N16",corridor:"Central Java",adv:31000,cpp:40,psm:26,action:"Relocate",tier:1},
+    {code:"N17",corridor:"Central Java",adv:118000,cpp:44,psm:43,action:"Retain",tier:1},
+    {code:"N18",corridor:"Central Java",adv:7000,cpp:144,psm:8,action:"Relocate",tier:3},
+    {code:"N19",corridor:"Central Java",adv:50000,cpp:79,psm:24,action:"Retain",tier:1},
+    {code:"N20",corridor:"Central Java",adv:6000,cpp:28,psm:32,action:"Retain",tier:3},
+    {code:"N21",corridor:"Central Java",adv:14000,cpp:113,psm:11,action:"Retain",tier:2},
+    {code:"N22",corridor:"Central Java",adv:32000,cpp:29,psm:28,action:"Retain",tier:1},
+    {code:"N23",corridor:"Central Java",adv:7000,cpp:67,psm:15,action:"Retain",tier:3},
+    {code:"N24",corridor:"Central Java",adv:5500,cpp:112,psm:31,action:"Relocate",tier:3},
+    {code:"N25",corridor:"Central Java",adv:4000,cpp:132,psm:5,action:"Retain",tier:3},
+    {code:"N26",corridor:"Central Java",adv:5000,cpp:173,psm:5,action:"Relocate",tier:3},
+    {code:"N27",corridor:"Central Java",adv:4000,cpp:111,psm:8,action:"Retain",tier:3},
+    {code:"N28",corridor:"East Java",adv:25000,cpp:28,psm:30,action:"Retain",tier:2},
+    {code:"N29",corridor:"East Java",adv:158000,cpp:51,psm:33,action:"Relocate",tier:1},
+    {code:"N30",corridor:"East Java",adv:2500,cpp:43,psm:29,action:"Retain",tier:3},
+    {code:"N31",corridor:"East Java",adv:14000,cpp:58,psm:12,action:"Retain",tier:2},
+    {code:"N32",corridor:"East Java",adv:24700,cpp:75,psm:24,action:"Relocate",tier:2},
+    {code:"N33",corridor:"East Java",adv:14600,cpp:95,psm:9,action:"Retain",tier:2},
+    {code:"N34",corridor:"East Java",adv:24000,cpp:629,psm:2,action:"Relocate",tier:2},
+    {code:"N35",corridor:"East Java",adv:5000,cpp:236,psm:11,action:"Retain",tier:2},
+    {code:"N36",corridor:"East Java",adv:2900,cpp:113,psm:29,action:"Retain",tier:3},
+    {code:"N37",corridor:"East Java",adv:3500,cpp:243,psm:4,action:"Retain",tier:3},
+    {code:"N38",corridor:"Sumatera",adv:3000,cpp:216,psm:7,action:"Relocate",tier:3},
+    {code:"N39",corridor:"Sumatera",adv:9400,cpp:135,psm:4,action:"Close",tier:2},
+    {code:"N40",corridor:"Sumatera",adv:1600,cpp:465,psm:2,action:"Retain",tier:3},
+    {code:"N41",corridor:"Sumatera",adv:622,cpp:303,psm:2,action:"Retain",tier:3},
+    {code:"N42",corridor:"Sumatera",adv:747,cpp:219,psm:1,action:"Retain",tier:3},
+    {code:"N43",corridor:"Sumatera",adv:540,cpp:585,psm:3,action:"Close",tier:3},
+    {code:"N44",corridor:"Sumatera",adv:562,cpp:477,psm:2,action:"Retain",tier:3},
+    {code:"N45",corridor:"Sumatera",adv:2300,cpp:291,psm:6,action:"Retain",tier:3},
+    {code:"N46",corridor:"Sumatera",adv:2000,cpp:370,psm:4,action:"Retain",tier:3},
+    {code:"N47",corridor:"Sumatera",adv:4200,cpp:75,psm:12,action:"Retain",tier:3},
+    {code:"N48",corridor:"Sumatera",adv:1200,cpp:634,psm:5,action:"Retain",tier:3}
+  ];
+  const CC={"West Java":"#2563EB","Central Java":"#D97706","East Java":"#059669","Sumatera":"#7C3AED"};
+  const AC={Close:"#DC2626",Relocate:"#F59E0B",Split:"#3B82F6",Renew:"#6366F1",Retain:"#10B981"};
+  const tip=d3.select("#viz-tooltip");
+  function showTip(e,h){tip.html(h).style("opacity",1).style("left",(e.pageX+14)+"px").style("top",(e.pageY-12)+"px");}
+  function hideTip(){tip.style("opacity",0);}
+
+  // === VIZ 1: WATERFALL ===
+  (function(){
+    const data=[
+      {label:"FY25\nBaseline",value:100,type:"base",desc:"Total Non-Metro annual rental cost across 35 active nodes"},
+      {label:"Closures",value:-4,type:"saving",desc:"2 nodes closed (Sumatera Barat + Sumatera Utara); volume migrated to neighboring hubs"},
+      {label:"S1 Relocations\n& Splits",value:-15,type:"saving",desc:"10 nodes relocated to right-sized facilities + 1 split (S1 realized)"},
+      {label:"S2 Relocations\n& Splits",value:-17,type:"saving",desc:"5 nodes relocated + 3 splits planned (East Java gateway: largest single intervention)"},
+      {label:"New\nCross-Dock",value:1,type:"cost",desc:"New-build cross-docking facility in Central Java \u2014 strategic investment"},
+      {label:"FY26\nNetwork",value:65,type:"result",desc:"29 active nodes, 38% lower cost base with maintained coverage"}
+    ];
+    const W=860,H=400,m={top:35,right:25,bottom:85,left:55};
+    const w=W-m.left-m.right,h=H-m.top-m.bottom;
+    const svg=d3.select("#waterfall-chart").append("svg").attr("viewBox","0 0 "+W+" "+H).attr("width","100%");
+    const g=svg.append("g").attr("transform","translate("+m.left+","+m.top+")");
+    const x=d3.scaleBand().domain(data.map(function(d){return d.label})).range([0,w]).padding(0.32);
+    const y=d3.scaleLinear().domain([0,110]).range([h,0]);
+    g.selectAll(".gl").data(y.ticks(5)).enter().append("line").attr("x1",0).attr("x2",w).attr("y1",function(d){return y(d)}).attr("y2",function(d){return y(d)}).attr("class","viz-grid-line");
+    var ya=g.append("g").attr("class","viz-axis").call(d3.axisLeft(y).ticks(5).tickFormat(function(d){return d+"%"}));
+    g.append("text").attr("transform","rotate(-90)").attr("x",-h/2).attr("y",-42).attr("text-anchor","middle").style("font-size","11px").style("fill","#6B7280").text("Relative Cost Level (%)");
+    var run=0;
+    var bars=data.map(function(d){
+      if(d.type==="base"){run=d.value;return Object.assign({},d,{y0:0,y1:d.value})}
+      if(d.type==="result"){return Object.assign({},d,{y0:0,y1:d.value})}
+      if(d.type==="saving"){var t=run;run+=d.value;return Object.assign({},d,{y0:run,y1:t})}
+      if(d.type==="cost"){var b=run;run+=d.value;return Object.assign({},d,{y0:b,y1:run})}
+    });
+    g.selectAll(".bar").data(bars).enter().append("rect")
+      .attr("x",function(d){return x(d.label)}).attr("y",function(d){return y(Math.max(d.y0,d.y1))})
+      .attr("width",x.bandwidth()).attr("height",function(d){return Math.abs(y(d.y0)-y(d.y1))})
+      .attr("rx",4).attr("fill",function(d){return d.type==="base"?"#374151":d.type==="result"?"#059669":d.type==="saving"?"#0D9488":"#B45454"})
+      .style("cursor","pointer")
+      .on("mousemove",function(e,d){showTip(e,"<strong>"+d.label.replace(/\n/g," ")+"</strong><br>"+d.desc+"<br><span style='color:#E8C95A'>"+(d.type==="saving"?d.value+"%":d.type==="cost"?"+"+d.value+"%":d.value+"%")+"</span>")})
+      .on("mouseleave",hideTip);
+    g.selectAll(".bl").data(bars).enter().append("text")
+      .attr("x",function(d){return x(d.label)+x.bandwidth()/2}).attr("y",function(d){return y(d.type==="saving"?d.y1:d.y1)-8})
+      .attr("text-anchor","middle").style("font-family","'JetBrains Mono',monospace").style("font-size","11px").style("font-weight","600")
+      .style("fill",function(d){return d.type==="saving"?"#0D9488":d.type==="cost"?"#B45454":"#374151"})
+      .text(function(d){return d.type==="base"?"100%":d.type==="result"?d.y1+"%":d.type==="saving"?d.value+"%":"+"+d.value+"%"});
+    data.forEach(function(d){var ls=d.label.split("\n"),xp=x(d.label)+x.bandwidth()/2;ls.forEach(function(l,i){g.append("text").attr("x",xp).attr("y",h+16+i*13).attr("text-anchor","middle").style("font-size","10px").style("fill","#374151").text(l)})});
+    for(var i=0;i<bars.length-2;i++){var c=bars[i],n=bars[i+1],ce=c.type==="base"?c.y1:c.type==="saving"?c.y0:c.y1;g.append("line").attr("x1",x(c.label)+x.bandwidth()).attr("x2",x(n.label)).attr("y1",y(ce)).attr("y2",y(ce)).attr("stroke","#D1D5DB").attr("stroke-dasharray","4,3")}
+  })();
+
+  // === VIZ 2: HEATMAP ===
+  (function(){
+    var leg=document.getElementById("heatmap-legend");
+    Object.entries(CC).forEach(function(e){leg.innerHTML+='<div class="viz-legend-item"><span class="viz-legend-dot" style="background:'+e[1]+'"></span>'+e[0]+'</div>'});
+    leg.innerHTML+='<div class="viz-legend-item" style="margin-left:.8rem"><span class="viz-legend-dot" style="border:2px solid #DC2626;background:transparent"></span>Closed</div>';
+    leg.innerHTML+='<div class="viz-legend-item"><span class="viz-legend-dot" style="border:2px solid #F59E0B;background:transparent"></span>Relocated</div>';
+    leg.innerHTML+='<div class="viz-legend-item"><span class="viz-legend-dot" style="border:2px solid #3B82F6;background:transparent"></span>Split</div>';
+    var W=860,H=500,m={top:18,right:25,bottom:55,left:60};
+    var w=W-m.left-m.right,h=H-m.top-m.bottom;
+    var svg=d3.select("#heatmap-chart").append("svg").attr("viewBox","0 0 "+W+" "+H).attr("width","100%");
+    var g=svg.append("g").attr("transform","translate("+m.left+","+m.top+")");
+    var x=d3.scaleLog().domain([10,700]).range([0,w]);
+    var y=d3.scaleLinear().domain([0,70]).range([h,0]);
+    var r=d3.scaleSqrt().domain([0,210000]).range([4,28]);
+    g.append("rect").attr("x",x(150)).attr("y",y(15)).attr("width",x(700)-x(150)).attr("height",y(0)-y(15)).attr("fill","#FEF2F2").attr("opacity",0.6);
+    g.append("text").attr("x",x(320)).attr("y",y(3)).attr("text-anchor","middle").style("font-size","9px").style("fill","#DC2626").style("font-weight","600").text("RED ZONE: High Cost / Low Utilization");
+    g.append("rect").attr("x",x(10)).attr("y",y(70)).attr("width",x(80)-x(10)).attr("height",y(25)-y(70)).attr("fill","#ECFDF5").attr("opacity",0.5);
+    g.append("text").attr("x",x(36)).attr("y",y(65)).attr("text-anchor","middle").style("font-size","9px").style("fill","#059669").style("font-weight","600").text("OPTIMAL");
+    g.append("line").attr("x1",x(80)).attr("x2",x(80)).attr("y1",0).attr("y2",h).attr("stroke","#0D9488").attr("stroke-dasharray","6,4").attr("stroke-width",1.5);
+    g.append("text").attr("x",x(80)+4).attr("y",12).style("font-size","9px").style("fill","#0D9488").text("CPP Benchmark (80 IDR)");
+    [20,50,100,200,500].forEach(function(v){g.append("line").attr("x1",x(v)).attr("x2",x(v)).attr("y1",0).attr("y2",h).attr("class","viz-grid-line")});
+    y.ticks(7).forEach(function(v){g.append("line").attr("x1",0).attr("x2",w).attr("y1",y(v)).attr("y2",y(v)).attr("class","viz-grid-line")});
+    g.append("g").attr("class","viz-axis").attr("transform","translate(0,"+h+")").call(d3.axisBottom(x).tickValues([10,20,50,100,200,500]).tickFormat(function(d){return d}));
+    g.append("text").attr("x",w/2).attr("y",h+42).attr("text-anchor","middle").style("font-size","11px").style("fill","#374151").text("Rental Cost-per-Parcel (IDR) \u2192");
+    g.append("g").attr("class","viz-axis").call(d3.axisLeft(y).ticks(7));
+    g.append("text").attr("transform","rotate(-90)").attr("x",-h/2).attr("y",-45).attr("text-anchor","middle").style("font-size","11px").style("fill","#374151").text("\u2191 Parcel per sqm (Utilization Density)");
+    g.selectAll(".bubble").data(nodes).enter().append("circle")
+      .attr("cx",function(d){return x(d.cpp)}).attr("cy",function(d){return y(d.psm)}).attr("r",function(d){return r(d.adv)})
+      .attr("fill",function(d){return CC[d.corridor]||"#888"}).attr("fill-opacity",0.55)
+      .attr("stroke",function(d){return AC[d.action]||"#888"}).attr("stroke-width",function(d){return d.action==="Close"||d.action==="Relocate"?2.5:1.5})
+      .attr("stroke-dasharray",function(d){return d.action==="Split"?"4,2":"none"})
+      .style("cursor","pointer")
+      .on("mousemove",function(e,d){showTip(e,"<strong>"+d.code+"</strong> \u2022 "+d.corridor+"<br>Tier "+d.tier+" \u2022 ADV: "+(d.adv/1000).toFixed(1)+"K<br>CPP: <span style='color:#E8C95A'>"+d.cpp+" IDR</span><br>Density: "+d.psm+" parcel/sqm<br>Action: <span style='color:"+AC[d.action]+"'>"+d.action+"</span>")})
+      .on("mouseleave",hideTip);
+    var lbl=["N43","N34","N48","N40","N05","N29","N08","N10","N17","N13"];
+    g.selectAll(".nl").data(nodes.filter(function(n){return lbl.indexOf(n.code)>-1})).enter().append("text")
+      .attr("x",function(d){return x(d.cpp)}).attr("y",function(d){return y(d.psm)-r(d.adv)-4}).attr("text-anchor","middle")
+      .style("font-size","9px").style("font-weight","600").style("fill",function(d){return CC[d.corridor]}).text(function(d){return d.code});
+  })();
+
+  // === VIZ 3: CORRIDOR IMPACT ===
+  (function(){
+    var corridors=["West Java","Central Java","East Java","Sumatera"];
+    var fy25={},fy26={};
+    var adj={N08:{cpp:49,psm:55},N29:{cpp:11,psm:114},N34:{cpp:120,psm:15},N38:{cpp:103,psm:22},N16:{cpp:30,psm:38},N18:{cpp:50,psm:35},N24:{cpp:50,psm:48},N26:{cpp:78,psm:28},N32:{cpp:40,psm:42},N07:{cpp:60,psm:28}};
+    var closed=["N43","N39"];
+    corridors.forEach(function(c){
+      var cn=nodes.filter(function(n){return n.corridor===c}),ta=d3.sum(cn,function(n){return n.adv});
+      fy25[c]={avgCpp:d3.sum(cn,function(n){return n.cpp*n.adv})/ta,avgPsm:d3.sum(cn,function(n){return n.psm*n.adv})/ta};
+      var cn2=nodes.filter(function(n){return n.corridor===c&&closed.indexOf(n.code)<0});
+      var aj=cn2.map(function(n){var a=adj[n.code];return a?Object.assign({},n,a):n});
+      var ta2=d3.sum(aj,function(n){return n.adv});
+      fy26[c]={avgCpp:d3.sum(aj,function(n){return n.cpp*n.adv})/ta2,avgPsm:d3.sum(aj,function(n){return n.psm*n.adv})/ta2};
+    });
+    var W=860,H=420,m={top:30,right:25,bottom:75,left:60};
+    var w=W-m.left-m.right,h=H-m.top-m.bottom;
+    var svg=d3.select("#corridor-chart").append("svg").attr("viewBox","0 0 "+W+" "+H).attr("width","100%");
+    var g=svg.append("g").attr("transform","translate("+m.left+","+m.top+")");
+    var halfW=(w-50)/2;
+    // LEFT: CPP
+    var xL=d3.scaleBand().domain(corridors).range([0,halfW]).padding(0.28);
+    var xLs=d3.scaleBand().domain(["FY25","FY26"]).range([0,xL.bandwidth()]).padding(0.08);
+    var yL=d3.scaleLinear().domain([0,d3.max(corridors,function(c){return Math.max(fy25[c].avgCpp,fy26[c].avgCpp)})*1.15]).range([h,0]);
+    g.append("rect").attr("x",0).attr("y",yL(80)).attr("width",halfW).attr("height",yL(0)-yL(80)).attr("fill","rgba(13,148,136,0.08)").attr("stroke","#0D9488").attr("stroke-dasharray","4,3");
+    g.append("text").attr("x",halfW-4).attr("y",yL(80)+11).attr("text-anchor","end").style("font-size","9px").style("fill","#0D9488").text("CPP Benchmark Zone");
+    yL.ticks(5).forEach(function(v){g.append("line").attr("x1",0).attr("x2",halfW).attr("y1",yL(v)).attr("y2",yL(v)).attr("class","viz-grid-line")});
+    g.append("g").attr("class","viz-axis").call(d3.axisLeft(yL).ticks(5).tickFormat(function(d){return d}));
+    g.append("text").attr("transform","rotate(-90)").attr("x",-h/2).attr("y",-45).attr("text-anchor","middle").style("font-size","11px").style("fill","#374151").text("Avg. CPP (IDR)");
+    corridors.forEach(function(c){
+      g.append("rect").attr("x",xL(c)+xLs("FY25")).attr("y",yL(fy25[c].avgCpp)).attr("width",xLs.bandwidth()).attr("height",h-yL(fy25[c].avgCpp)).attr("rx",3).attr("fill","#B45454").attr("opacity",0.8);
+      g.append("text").attr("x",xL(c)+xLs("FY25")+xLs.bandwidth()/2).attr("y",yL(fy25[c].avgCpp)-5).attr("text-anchor","middle").style("font-size","10px").style("font-weight","600").style("fill","#B45454").text(Math.round(fy25[c].avgCpp));
+      g.append("rect").attr("x",xL(c)+xLs("FY26")).attr("y",yL(fy26[c].avgCpp)).attr("width",xLs.bandwidth()).attr("height",h-yL(fy26[c].avgCpp)).attr("rx",3).attr("fill","#059669").attr("opacity",0.85);
+      g.append("text").attr("x",xL(c)+xLs("FY26")+xLs.bandwidth()/2).attr("y",yL(fy26[c].avgCpp)-5).attr("text-anchor","middle").style("font-size","10px").style("font-weight","600").style("fill","#059669").text(Math.round(fy26[c].avgCpp));
+      var p=Math.round((1-fy26[c].avgCpp/fy25[c].avgCpp)*100);
+      if(p>0)g.append("text").attr("x",xL(c)+xL.bandwidth()/2).attr("y",h+34).attr("text-anchor","middle").style("font-size","11px").style("font-weight","700").style("fill","#059669").text("-"+p+"%");
+    });
+    corridors.forEach(function(c){g.append("text").attr("x",xL(c)+xL.bandwidth()/2).attr("y",h+16).attr("text-anchor","middle").style("font-size","10px").style("fill","#374151").text(c)});
+    g.append("text").attr("x",halfW/2).attr("y",-10).attr("text-anchor","middle").style("font-size","12px").style("font-weight","600").style("fill","#374151").text("Average Cost-per-Parcel");
+    // RIGHT: Utilization
+    var ox=halfW+50;
+    var xR=d3.scaleBand().domain(corridors).range([0,halfW]).padding(0.28);
+    var xRs=d3.scaleBand().domain(["FY25","FY26"]).range([0,xR.bandwidth()]).padding(0.08);
+    var yR=d3.scaleLinear().domain([0,d3.max(corridors,function(c){return Math.max(fy25[c].avgPsm,fy26[c].avgPsm)})*1.2]).range([h,0]);
+    var gR=g.append("g").attr("transform","translate("+ox+",0)");
+    gR.append("rect").attr("x",0).attr("y",yR(40)).attr("width",halfW).attr("height",yR(0)-yR(40)).attr("fill","rgba(13,148,136,0.08)").attr("stroke","#0D9488").attr("stroke-dasharray","4,3");
+    gR.append("text").attr("x",halfW-4).attr("y",yR(40)+11).attr("text-anchor","end").style("font-size","9px").style("fill","#0D9488").text("Density Target (40+ psm)");
+    yR.ticks(5).forEach(function(v){gR.append("line").attr("x1",0).attr("x2",halfW).attr("y1",yR(v)).attr("y2",yR(v)).attr("class","viz-grid-line")});
+    gR.append("g").attr("class","viz-axis").call(d3.axisLeft(yR).ticks(5));
+    gR.append("text").attr("transform","rotate(-90)").attr("x",-h/2).attr("y",-45).attr("text-anchor","middle").style("font-size","11px").style("fill","#374151").text("Avg. Parcel/sqm");
+    corridors.forEach(function(c){
+      gR.append("rect").attr("x",xR(c)+xRs("FY25")).attr("y",yR(fy25[c].avgPsm)).attr("width",xRs.bandwidth()).attr("height",h-yR(fy25[c].avgPsm)).attr("rx",3).attr("fill","#B45454").attr("opacity",0.8);
+      gR.append("text").attr("x",xR(c)+xRs("FY25")+xRs.bandwidth()/2).attr("y",yR(fy25[c].avgPsm)-5).attr("text-anchor","middle").style("font-size","10px").style("font-weight","600").style("fill","#B45454").text(Math.round(fy25[c].avgPsm));
+      gR.append("rect").attr("x",xR(c)+xRs("FY26")).attr("y",yR(fy26[c].avgPsm)).attr("width",xRs.bandwidth()).attr("height",h-yR(fy26[c].avgPsm)).attr("rx",3).attr("fill","#059669").attr("opacity",0.85);
+      gR.append("text").attr("x",xR(c)+xRs("FY26")+xRs.bandwidth()/2).attr("y",yR(fy26[c].avgPsm)-5).attr("text-anchor","middle").style("font-size","10px").style("font-weight","600").style("fill","#059669").text(Math.round(fy26[c].avgPsm));
+      var p=Math.round((fy26[c].avgPsm/fy25[c].avgPsm-1)*100);
+      if(p>0)gR.append("text").attr("x",xR(c)+xR.bandwidth()/2).attr("y",h+34).attr("text-anchor","middle").style("font-size","11px").style("font-weight","700").style("fill","#059669").text("+"+p+"%");
+    });
+    corridors.forEach(function(c){gR.append("text").attr("x",xR(c)+xR.bandwidth()/2).attr("y",h+16).attr("text-anchor","middle").style("font-size","10px").style("fill","#374151").text(c)});
+    gR.append("text").attr("x",halfW/2).attr("y",-10).attr("text-anchor","middle").style("font-size","12px").style("font-weight","600").style("fill","#374151").text("Average Utilization Density");
+  })();
+})();
+</script>
+
+<!-- ============ SCROLL ANIMATION ============ -->
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
